@@ -1,4 +1,4 @@
-package ru.project.aromalarservice.entity;
+package ru.project.aromalarservice.model.entity;
 
 import jakarta.persistence.*;
 import lombok.Data;
@@ -12,6 +12,7 @@ public class Diffuser {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
     private String name;
+    private Integer price;
 
 
 }

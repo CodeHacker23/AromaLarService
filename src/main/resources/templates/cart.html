@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Корзина</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f4;
+        }
+
+        header {
+            background-color: #333;
+            color: white;
+            padding: 10px;
+            text-align: center;
+        }
+
+        header a {
+            color: white;
+            text-decoration: none;
+            margin-top: 10px;
+            display: inline-block;
+        }
+
+        main {
+            padding: 20px;
+        }
+
+        h2 {
+            font-size: 24px;
+            margin-bottom: 20px;
+        }
+
+        .cart-container {
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .cart-item {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 20px;
+            border-bottom: 1px solid #ddd;
+            padding-bottom: 10px;
+        }
+
+        .item-info {
+            width: 70%;
+        }
+
+        .quantity-controls {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-end;
+        }
+
+        .quantity-controls input {
+            width: 60px;
+            padding: 5px;
+            margin-bottom: 10px;
+        }
+
+        .checkout {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 20px;
+        }
+
+        .checkout-btn {
+            padding: 10px 20px;
+            background-color: #333;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+
+        .checkout-btn:hover {
+            background-color: #555;
+        }
+
+        .cart-link {
+            color: white;
+            text-decoration: none;
+            font-size: 18px;
+        }
+    </style>
+</head>
+<body>
+<header>
+    <h1>Корзина</h1>
+    <a href="/products" class="cart-link">Назад к товарам</a>
+</header>
+
+<main>
+    <div class="cart-container">
+        <h2>Товары в корзине</h2>
+        <div class="cart-items" th:each="item : ${cart.items}">
+            <div class="cart-item">
+                <div class="item-info">
+                    <h3 th:text="${item.product.name}">Диффузер</h3>
+                    <p th:text="${item.product.description}">Описание товара</p>
+                    <p th:text="${item.product.price}">Цена: 1 500 руб.</p>
+                </div>
+                <div class="quantity-controls">
+                    <form action="/cart/update" method="post">
+                        <input type="hidden" name="productId" th:value="${item.product.id}">
+                        <input type="number" name="quantity" th:value="${item.quantity}" min="1">
+                        <button type="submit">Обновить количество</button>
+                    </form>
+                    <form action="/cart/remove" method="post">
+                        <input type="hidden" name="productId" th:value="${item.product.id}">
+                        <button type="submit">Удалить</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="checkout">
+        <h3>Общая сумма: <span th:text="${cart.totalPrice}">1 500 руб.</span></h3>
+        <form action="/cart/checkout" method="post">
+            <button type="submit" class="checkout-btn">Оформить заказ</button>
+        </form>
+    </div>
+</main>
+</body>
+</html>

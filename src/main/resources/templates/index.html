@@ -1,10 +1,109 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <title>Title</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Магазин диффузеров</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f4;
+        }
+
+        header {
+            background-color: #333;
+            color: white;
+            padding: 10px;
+            text-align: center;
+        }
+
+        header a {
+            color: white;
+            text-decoration: none;
+            margin-top: 10px;
+            display: inline-block;
+        }
+
+        main {
+            padding: 20px;
+        }
+
+        h2 {
+            font-size: 24px;
+            margin-bottom: 20px;
+        }
+
+        .product-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+
+        .product {
+            background-color: white;
+            border: 1px solid #ddd;
+            padding: 10px;
+            width: calc(33.333% - 20px);
+            box-sizing: border-box;
+            text-align: center;
+            border-radius: 8px;
+            transition: transform 0.3s;
+        }
+
+        .product:hover {
+            transform: scale(1.05);
+        }
+
+        .product img {
+            width: 100%;
+            max-width: 200px;
+            border-radius: 8px;
+        }
+
+        .product h3 {
+            font-size: 18px;
+            margin: 10px 0;
+        }
+
+        .product p {
+            font-size: 14px;
+            color: #666;
+            margin-bottom: 10px;
+        }
+
+        .product form {
+            margin-top: 10px;
+        }
+
+        .cart-link {
+            color: white;
+            text-decoration: none;
+            font-size: 18px;
+        }
+    </style>
 </head>
 <body>
+<header>
+    <h1>Магазин диффузеров</h1>
+    <a href="/cart" class="cart-link">Корзина</a>
+</header>
 
+<main>
+    <h2>Наши диффузеры</h2>
+    <div class="product-list">
+        <div class="product" th:each="diffuser : ${diffusers}">
+            <img th:src="@{${diffuser.imageUrl}}" alt="Диффузер">
+            <h3 th:text="${diffuser.name}">Диффузер</h3>
+            <p th:text="${diffuser.description}">Описание товара</p>
+            <p th:text="${diffuser.price}">Цена: 1 500 руб.</p>
+            <form action="/cart/add" method="post">
+                <input type="hidden" name="id" th:value="${diffuser.id}">
+                <button type="submit">Добавить в корзину</button>
+            </form>
+        </div>
+    </div>
+</main>
 </body>
 </html>
