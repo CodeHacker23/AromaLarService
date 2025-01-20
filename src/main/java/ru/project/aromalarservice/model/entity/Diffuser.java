@@ -11,7 +11,9 @@ public class Diffuser {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
+    private String url;
     private String name;
+    private String description;
     private Integer price;
 
 

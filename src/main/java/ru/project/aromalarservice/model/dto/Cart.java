@@ -1,10 +1,13 @@
 package ru.project.aromalarservice.model.dto;
 
+import lombok.AllArgsConstructor;
+import lombok.Data;
 import ru.project.aromalarservice.model.entity.Diffuser;
 
 import java.util.HashMap;
 import java.util.Map;
 
+@Data
 public class Cart {
 
     private Map<Long, CartItem> items = new HashMap<>();
@@ -47,38 +50,17 @@ public class Cart {
         return total;
     }
 
+
+    @Data
+    @AllArgsConstructor
     // Вложенный класс для представления товара в корзине
     public static class CartItem {
         private Diffuser diffuser;
         private int quantity;
 
-        // Конструктор
-        public CartItem(Diffuser diffuser, int quantity) {
-            this.diffuser = diffuser;
-            this.quantity = quantity;
-        }
-
-        // Получить цену товара
-        public double getPrice() {
-            return diffuser.getPrice();
-        }
-
-        // Получить название товара
-        public String getName() {
-            return diffuser.getName();
-        }
-
-        public int getQuantity() {
-            return quantity;
-        }
-
-        public void setQuantity(int quantity) {
-            this.quantity = quantity;
-        }
-
         // Общая цена для этого товара (цена * количество)
         public double getTotalPrice() {
-            return getPrice() * quantity;
+            return diffuser.getPrice() * quantity;
         }
     }
 }
