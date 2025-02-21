@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Корзина</title>
+    <title>Basket</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -13,7 +13,7 @@
         }
 
         header {
-            background-color: #333;
+            background-color: rgba(101, 24, 24, 0.84);
             color: white;
             padding: 10px;
             text-align: center;
@@ -35,54 +35,46 @@
             margin-bottom: 20px;
         }
 
-        .cart-container {
+        .product-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+
+        .product {
             background-color: white;
-            padding: 20px;
+            border: 1px solid #ddd;
+            padding: 10px;
+            width: calc(33.333% - 20px);
+            box-sizing: border-box;
+            text-align: center;
             border-radius: 8px;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s;
         }
 
-        .cart-item {
-            display: flex;
-            justify-content: space-between;
-            margin-bottom: 20px;
-            border-bottom: 1px solid #ddd;
-            padding-bottom: 10px;
+        .product:hover {
+            transform: scale(1.05);
         }
 
-        .item-info {
-            width: 70%;
+        .product img {
+            width: 100%;
+            max-width: 200px;
+            border-radius: 8px;
         }
 
-        .quantity-controls {
-            display: flex;
-            flex-direction: column;
-            align-items: flex-end;
+        .product h3 {
+            font-size: 18px;
+            margin: 10px 0;
         }
 
-        .quantity-controls input {
-            width: 60px;
-            padding: 5px;
+        .product p {
+            font-size: 14px;
+            color: #666;
             margin-bottom: 10px;
         }
 
-        .checkout {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-top: 20px;
-        }
-
-        .checkout-btn {
-            padding: 10px 20px;
-            background-color: #333;
-            color: white;
-            border: none;
-            cursor: pointer;
-        }
-
-        .checkout-btn:hover {
-            background-color: #555;
+        .product form {
+            margin-top: 10px;
         }
 
         .cart-link {
@@ -94,41 +86,23 @@
 </head>
 <body>
 <header>
-    <h1>Корзина</h1>
-    <a href="/products" class="cart-link">Назад к товарам</a>
+    <h1>Aromolar</h1>
+    <a href="/cart" class="cart-link">Корзина</a>
 </header>
 
 <main>
-    <div class="cart-container">
-        <h2>Товары в корзине</h2>
-        <div class="cart-items" th:each="item : ${cart.items}">
-            <div class="cart-item">
-                <div class="item-info">
-                    <h3 th:text="${item.product.name}">Диффузер</h3>
-                    <p th:text="${item.product.description}">Описание товара</p>
-                    <p th:text="${item.product.price}">Цена: 1 500 руб.</p>
-                </div>
-                <div class="quantity-controls">
-                    <form action="/cart/update" method="post">
-                        <input type="hidden" name="productId" th:value="${item.product.id}">
-                        <input type="number" name="quantity" th:value="${item.quantity}" min="1">
-                        <button type="submit">Обновить количество</button>
-                    </form>
-                    <form action="/cart/remove" method="post">
-                        <input type="hidden" name="productId" th:value="${item.product.id}">
-                        <button type="submit">Удалить</button>
-                    </form>
-                </div>
-            </div>
+    <h2>Корзина</h2>
+    <div class="product-list">
+
+        <div class="product" th:each="diffuser : ${list}">
+            <img th:src="@{${diffuser.url}}" alt="Диффузер">
+            <h3 th:text="${diffuser.name}">Диффузер</h3>
+            <p th:text="${diffuser.description}">Описание товара</p>
+            <p th:text="${diffuser.price}">Цена: 1 500 руб.</p>
+
         </div>
     </div>
 
-    <div class="checkout">
-        <h3>Общая сумма: <span th:text="${cart.totalPrice}">1 500 руб.</span></h3>
-        <form action="/cart/checkout" method="post">
-            <button type="submit" class="checkout-btn">Оформить заказ</button>
-        </form>
-    </div>
 </main>
 </body>
 </html>

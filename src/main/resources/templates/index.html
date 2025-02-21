@@ -95,7 +95,7 @@
     <div class="product-list">
 
         <div class="product" th:each="diffuser : ${diffusers}">
-            <img th:src="@{${diffuser.imageUrl}}" alt="Диффузер">
+            <img th:src="@{${diffuser.url}}" alt="Диффузер">
             <h3 th:text="${diffuser.name}">Диффузер</h3>
             <p th:text="${diffuser.description}">Описание товара</p>
             <p th:text="${diffuser.price}">Цена: 1 500 руб.</p>

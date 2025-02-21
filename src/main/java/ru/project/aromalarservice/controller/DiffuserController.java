@@ -16,6 +16,9 @@ import ru.project.aromalarservice.repositiria.DiffuserRepository;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.UUID;
 
 @Slf4j
 @Controller
@@ -24,9 +27,6 @@ import java.nio.file.Files;
 public class DiffuserController {
 
     private DiffuserRepository diffuserRepository;
-
-
-
 
     @GetMapping("/add")
     public String addGet() {
@@ -38,56 +38,62 @@ public class DiffuserController {
                           @RequestParam("description") String description,
                           @RequestParam("price") Integer price,
                           @RequestParam("image") MultipartFile file,
-                          Model model
-                          ) {
-
-
-
-
+                          Model model) {
         try {
-            // Убедимся, что директория существует
-            log.info("");
-            File dirImg = new File("img/");
-            if (!dirImg.exists()) {
-                dirImg.mkdirs(); // Создаем директорию, если её нет
-                log.info("Создаем директорию");
+            // 1. Проверка на пустой файл
+            if (file.isEmpty()) {
+                model.addAttribute("error", "Файл изображения обязателен");
+                return "add_diffuser";
             }
-            log.info("диреткория уже была");
 
-
-            // Получаем оригинальное имя файла
+            // 2. Проверка имени файла
             String originalFileName = file.getOriginalFilename();
-            log.info("name file " + originalFileName);
+            if (originalFileName == null || originalFileName.isBlank()) {
+                model.addAttribute("error", "Неверное имя файла");
+                return "add_diffuser";
+            }
 
-            // Создаем путь для сохранения файла
-            File destinationFile = new File("img/" + originalFileName);
-            log.info("path for file save "  +destinationFile.toString());
+            // 3. Правильный путь к директории
+            String uploadDir = "src/main/resources/static/img/";
+            File dirImg = new File(uploadDir);
+            if (!dirImg.exists() && !dirImg.mkdirs()) {
+                log.error("Не удалось создать директорию: {}", uploadDir);
+                model.addAttribute("error", "Ошибка сервера при создании директории");
+                return "add_diffuser";
+            }
 
+            // 4. Генерация уникального имени файла
+            String fileName = UUID.randomUUID() + "_" + originalFileName.replace(" ", "_");
+            Path filePath = Paths.get(uploadDir + fileName);
 
-            Files.createFile(destinationFile.toPath());
-            log.info("save img to dir");
+            // 5. Сохранение файла (автоматически создает файл если его нет)
+            Files.write(filePath, file.getBytes());
+            log.info("Файл сохранен: {}", filePath);
 
-            Files.write(destinationFile.toPath(),file.getBytes());
+            // 6. Формирование относительного пути для web
+            String webPath = "/static/img/" + fileName.replace("\\", "/"); // Убедимся в правильных слешах
 
-            Diffuser diffuser=new Diffuser();
+            // 7. Создание и сохранение объекта
+            Diffuser diffuser = new Diffuser();
             diffuser.setName(name);
             diffuser.setPrice(price);
             diffuser.setDescription(description);
-            diffuser.setUrl(destinationFile.toString());
-            log.info("create object " + diffuser );
+            diffuser.setUrl(webPath); // Сохраняем web-путь
 
             diffuserRepository.save(diffuser);
-            log.info("save object to DB");
+            log.info("Объект сохранен в БД: {}", diffuser);
 
-            // Возвращаем имя файла
-            model.addAttribute("success","Товар добавлен");
+            model.addAttribute("success", "Товар успешно добавлен");
             return "add_diffuser";
 
         } catch (IOException e) {
-            model.addAttribute("error","Товар не добавлен");
+            log.error("Ошибка при сохранении файла: {}", e.getMessage());
+            model.addAttribute("error", "Ошибка при загрузке изображения: " + e.getMessage());
+            return "add_diffuser";
+        } catch (Exception e) {
+            log.error("Общая ошибка: {}", e.getMessage());
+            model.addAttribute("error", "Внутренняя ошибка сервера: " + e.getMessage());
             return "add_diffuser";
         }
-
     }
-
 }

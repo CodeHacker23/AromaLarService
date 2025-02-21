@@ -1,36 +1,93 @@
 package ru.project.aromalarservice.controller;
 
 import jakarta.servlet.http.HttpSession;
+import lombok.AllArgsConstructor;
+import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import ru.project.aromalarservice.model.dto.Basket;
 import ru.project.aromalarservice.model.dto.Cart;
 import ru.project.aromalarservice.model.entity.Diffuser;
+import ru.project.aromalarservice.repositiria.DiffuserRepository;
 
+import java.util.List;
+
+@Controller
+@RequestMapping("/cart")
+@AllArgsConstructor
 public class CartController {
 
+    private Basket basket;
+   private DiffuserRepository diffuserRepository;
 
+
+    @PostMapping("/add")
+    public String addToCart(@RequestParam Long id, HttpSession session) {
+        try {
+            Basket basket = getOrCreateBasket(session);
+            Diffuser diffuser = diffuserRepository.findById(id)
+                    .orElseThrow(() -> new IllegalArgumentException("Товар не найден"));
+            basket.getDiffusers().add(diffuser);
+        } catch (Exception e) {
+            // Логирование ошибки
+        }
+        return "redirect:/";
+    }
+
+    private Basket getOrCreateBasket(HttpSession session) {
+        Basket basket = (Basket) session.getAttribute("basket");
+        if(basket == null) {
+            basket = new Basket();
+            session.setAttribute("basket", basket);
+        }
+        return basket;
+    }
+
+
+
+   @GetMapping("/basket")
+   public String basket(Model model,HttpSession session){
+
+       Basket basket = (Basket) session.getAttribute("basket");
+       if(basket == null) {
+           basket = new Basket();
+           session.setAttribute("basket", basket);
+       }
+
+       System.out.println(basket.getDiffusers());
+     List<Diffuser> diffusers = basket.getDiffusers();
+       model.addAttribute("list",diffusers);
+       return "cart";
+   }
+
+
+//
 //    //    добвление дифузера в корзину
 //    @PostMapping("/add")
-//    public String addToCart(@RequestParam Long id, HttpSession session) {
+//    public String addToCart(Basket basket,@RequestParam Long id) {
+//
+//
 //        // Получаем диффузер по id
-//        Diffuser diffuser = findDiffuserById(id);  // Предположим, у нас есть метод для поиска диффузера по id
-//        Cart cart = getCartFromSession(session);
-//        cart.addProduct(diffuser);
-//        return "redirect:/cart";  // Перенаправляем обратно на страницу корзины
+//        Diffuser diffuser = diffuserRepository.findById(id).orElse(null);
+//        System.out.println(diffuser);
+//
+//        basket.getDiffusers().add(diffuser);
+//        return "redirect:/";  // Перенаправляем обратно на страницу корзины
 //    }
 
 
 
-
-    // Метод для отображения корзины
-    @GetMapping
-    public String viewCart(HttpSession session, Model model) {
-        Cart cart = getCartFromSession(session);
-        model.addAttribute("cart", cart);
-        return "cart";  // cart.html
-    }
+//
+//    // Метод для отображения корзины
+//    @GetMapping
+//    public String viewCart(HttpSession session, Model model) {
+//        Cart cart = getCartFromSession(session);
+//        model.addAttribute("cart", cart);
+//        return "cart";  // cart.html
+//    }
 
 
     // Метод для обновления количества товара в корзине
